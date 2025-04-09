@@ -1,0 +1,53 @@
+const mongoose = require('mongoose');
+
+const ShopSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please add a name'],
+        unique: true,
+        trim: true,
+        maxlength: [50, 'Name can not be more than 50 characters'],
+    },
+    description: {
+        type: String
+    },
+    address: {
+        type: String,
+        required: [true, 'Please add an address']
+    },
+    district: {
+        type: String,
+        required: [true, 'Please add a district']
+    },
+    province: {
+        type: String,
+        required: [true, 'Please add a province']
+    },
+    postalcode: {
+        type: String,
+        required: [true, 'Please add a postal code'],
+        maxlength: [5, 'Postal code can not be more than 5 characters']
+    },
+    tel: {
+        type: String
+    },
+    showOwner: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: true
+    }
+}/*, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+}*/);
+
+// TODO: uncomment these lines when finishing the massage reservation model
+// // Reverse populate with virtuals
+// HospitalSchema.virtual('reservations', {
+//     ref: 'Reservation',
+//     localField: '_id',
+//     foreignField: 'shop',
+//     justOne: false
+// })
+
+module.exports = mongoose.model('Shop', ShopSchema);
