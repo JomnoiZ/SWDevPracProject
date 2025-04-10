@@ -11,7 +11,7 @@ connectDB();
 
 // Route files
 const shops = require('./routes/shops');
-const appointments = require('./routes/reservations');
+const reservations = require('./routes/reservations');
 const auth = require('./routes/auth');
 
 const app = express();
