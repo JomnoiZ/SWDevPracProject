@@ -5,40 +5,52 @@ const req = require("express/lib/request");
 // @desc    Get all appointments
 // @route   GET /api/v1/appointments
 // @access  Public
+// @desc    Get all reservations or reservations for a specific shop
+// @route   GET /api/v1/reservations
+// @route   GET /api/v1/shops/:shopId/reservations
+// @access  Private (user or admin)
 exports.getReservations = async (req, res, next) => {
-  let query;
-  //General users can see only their appointments!
-  if (req.user.role !== "admin") {
-    query = Reservation.find({ user: req.user.id }).populate({
+  try {
+    let query;
+
+    const populateOptions = {
       path: "shop",
       select: "name province tel openTime closeTime",
-    });
-  } else {
+    };
+
     if (req.params.shopId) {
-      console.log(req.params.shopId);
-      query = Reservation.find({ shop: req.params.shopId }).populate({
-        path: "shop",
-        select: "name province tel openTime closeTime",
-      });
+      if (req.user.role === "user") {
+        return res.status(401).json({
+          success: false,
+          error: `User ${req.user.id} is not authorized to view this shop's reservation`,
+        });
+      }
+      query = Reservation.find({ shop: req.params.shopId }).populate(
+        populateOptions
+      );
     } else {
-      query = Reservation.find().populate({
-        path: "shop",
-        select: "name province tel openTime closeTime",
-      });
+      if (req.user.role !== "admin") {
+        query = Reservation.find({ user: req.user.id }).populate(
+          populateOptions
+        );
+      } else {
+        query = Reservation.find().populate(populateOptions);
+      }
     }
-  }
-  try {
+
     const reservations = await query;
+
     res.status(200).json({
       success: true,
       count: reservations.length,
       data: reservations,
     });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, error: "Cannot find Reservation" });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Cannot find reservations",
+    });
   }
 };
 
@@ -49,10 +61,58 @@ exports.getReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel",
+      select: "name description tel openTime closeTime",
     });
     if (!reservation) {
-      return res.status(400).json({ success: false });
+      return res
+        .status(400)
+        .json({ success: false, message: "Cannot find reservation" });
+    }
+    //Make sure user is appointment owner
+    if (
+      reservation.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: `User ${req.user.id} is not authorized to view this reservation`,
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: reservation,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, error: "Cannot find reservation" });
+  }
+};
+
+// @desc    Get single appointment
+// @route   GET /api/v1/appointments/:id
+// @access  Public
+exports.getReservationByShopId = async (req, res, next) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id).populate({
+      path: "shop",
+      select: "name description tel openTime closeTime",
+    });
+    if (!reservation) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Cannot find reservation" });
+    }
+    //Make sure user is appointment owner
+    if (
+      reservation.user.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: `User ${req.user.id} is not authorized to view this reservation`,
+      });
     }
     res.status(200).json({
       success: true,
