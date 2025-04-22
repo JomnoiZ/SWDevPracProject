@@ -1,45 +1,47 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const ShopSchema = new mongoose.Schema({
+const ShopSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: [true, 'Please add a name'],
-        unique: true,
-        trim: true,
-        maxlength: [50, 'Name can not be more than 50 characters'],
+      type: String,
+      required: [true, "Please add a name"],
+      unique: true,
+      trim: true,
+      maxlength: [50, "Name can not be more than 50 characters"],
     },
     description: {
-        type: String
+      type: String,
     },
     address: {
-        type: String,
-        required: [true, 'Please add an address']
+      type: String,
+      required: [true, "Please add an address"],
     },
     district: {
-        type: String,
-        required: [true, 'Please add a district']
+      type: String,
+      required: [true, "Please add a district"],
     },
     province: {
-        type: String,
-        required: [true, 'Please add a province']
+      type: String,
+      required: [true, "Please add a province"],
     },
     postalcode: {
-        type: String,
-        required: [true, 'Please add a postal code'],
-        maxlength: [5, 'Postal code can not be more than 5 characters']
+      type: String,
+      required: [true, "Please add a postal code"],
+      maxlength: [5, "Postal code can not be more than 5 characters"],
     },
     tel: {
-        type: String
+      type: String,
     },
-    showOwner: {
+    shopOwner: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: true
-    }
-}/*, {
+      ref: "User",
+      required: true,
+    },
+  } /*, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
-}*/);
+}*/
+);
 
 // TODO: uncomment these lines when finishing the massage reservation model
 // // Reverse populate with virtuals
@@ -50,4 +52,4 @@ const ShopSchema = new mongoose.Schema({
 //     justOne: false
 // })
 
-module.exports = mongoose.model('Shop', ShopSchema);
+module.exports = mongoose.model("Shop", ShopSchema);
