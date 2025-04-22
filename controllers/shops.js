@@ -7,6 +7,7 @@ const { castObject } = require("../models/user");
 // @access   Public
 exports.getShops = async (req, res, next) => {
   try {
+    // console.log(req.user.id);
     let query;
 
     // Copy req.query
@@ -101,6 +102,7 @@ exports.getShop = async (req, res, next) => {
 // @access   Private
 exports.createShop = async (req, res, next) => {
   try {
+    req.body.shopOwner = req.user.id;
     const shop = await Shop.create(req.body);
     res.status(201).json({
       success: true,

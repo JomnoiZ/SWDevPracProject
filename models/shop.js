@@ -32,6 +32,16 @@ const ShopSchema = new mongoose.Schema(
     tel: {
       type: String,
     },
+    openTime: {
+      type: String,
+      required: true,
+      match: [/^([0-1]\d|2[0-3]):([0-5]\d)$/, "Please use HH:mm format"],
+    },
+    closeTime: {
+      type: String,
+      required: true,
+      match: [/^([0-1]\d|2[0-3]):([0-5]\d)$/, "Please use HH:mm format"],
+    },
     shopOwner: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -44,12 +54,12 @@ const ShopSchema = new mongoose.Schema(
 );
 
 // TODO: uncomment these lines when finishing the massage reservation model
-// // Reverse populate with virtuals
-// HospitalSchema.virtual('reservations', {
-//     ref: 'Reservation',
-//     localField: '_id',
-//     foreignField: 'shop',
-//     justOne: false
-// })
+// Reverse populate with virtuals
+ShopSchema.virtual("reservations", {
+  ref: "Reservation",
+  localField: "_id",
+  foreignField: "shop",
+  justOne: false,
+});
 
 module.exports = mongoose.model("Shop", ShopSchema);

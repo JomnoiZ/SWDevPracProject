@@ -19,7 +19,7 @@ router.use("/:shopId/reservations/", reservationRouter);
 router
   .route("/")
   .get(getShops)
-  .post(protect, authorize("shopOwner", " admin"), createShop);
+  .post(protect, authorize("shopOwner", "admin"), createShop);
 router
   .route("/:id")
   .get(getShop)
