@@ -11,13 +11,12 @@ const {
   deleteReservation,
 } = require("../controllers/reservations");
 
-// TODO: add routes for massage reservation
 // TODO: give access RUD to admin after finishing the routes
 router.route("/").get(protect, getReservations).post(protect, addReservation);
 router
   .route("/:id")
   .get(protect, getReservation)
-  .put(protect, authorize("admin", "user"), updateReservation)
-  .delete(protect, authorize("admin", "user"), deleteReservation);
+  .put(protect, authorize("admin", "shopOwner", "user"), updateReservation)
+  .delete(protect, authorize("admin", "shopOwner", "user"), deleteReservation);
 
 module.exports = router;
