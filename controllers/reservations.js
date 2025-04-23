@@ -68,7 +68,7 @@ exports.getReservation = async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "Cannot find reservation" });
     }
-    //Make sure user is appointment owner
+    // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -104,7 +104,8 @@ exports.getReservationByShopId = async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "Cannot find reservation" });
     }
-    //Make sure user is appointment owner
+    
+    // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -126,9 +127,9 @@ exports.getReservationByShopId = async (req, res, next) => {
   }
 };
 
-//@desc     Create new appointment
-//@route    POST /api/v1/hospitals/:hospitalId/appointments
-//@access   Private
+// @desc     Create new appointment
+// @route    POST /api/v1/hospitals/:hospitalId/appointments
+// @access   Private
 exports.addReservation = async (req, res, next) => {
   try {
     req.body.shop = req.params.shopId;
@@ -144,10 +145,10 @@ exports.addReservation = async (req, res, next) => {
 
     req.body.user = req.user.id;
 
-    //Check for existed reservation
+    // Check for existed reservation
     const existedReservations = await Reservation.find({ user: req.user.id });
 
-    //If the user is not an admin, they can only create 3 reservation.
+    // If the user is not an admin, they can only create 3 reservation.
     if (existedReservations.length >= 3 && req.user.role !== "admin") {
       return res.status(400).json({
         success: false,
@@ -183,7 +184,7 @@ exports.updateReservation = async (req, res, next) => {
       });
     }
 
-    //Make sure user is appointment owner
+    // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -225,7 +226,7 @@ exports.deleteReservation = async (req, res, next) => {
       });
     }
 
-    //Make sure user is reservation owner
+    // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin"

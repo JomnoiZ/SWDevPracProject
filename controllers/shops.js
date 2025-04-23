@@ -28,7 +28,7 @@ exports.getShops = async (req, res, next) => {
     );
 
     // Finding resource
-    query = Shop.find(JSON.parse(queryStr)) /*.populate('reservations')*/;
+    query = Shop.find(JSON.parse(queryStr)).populate('reservations');
 
     // Select Fields
     if (req.query.select) {
@@ -146,7 +146,7 @@ exports.deleteShop = async (req, res, next) => {
         message: `Shop not found with id of ${req.params.id}`,
       });
     }
-    // await Reservation.deleteMany({ shop: req.params.id });
+    await Reservation.deleteMany({ shop: req.params.id });
     await Shop.deleteOne({ _id: req.params.id });
 
     res.status(200).json({ success: true, data: {} });

@@ -47,13 +47,12 @@ const ShopSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-  } /*, {
+  }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
-}*/
+}
 );
 
-// TODO: uncomment these lines when finishing the massage reservation model
 // Reverse populate with virtuals
 ShopSchema.virtual("reservations", {
   ref: "Reservation",
