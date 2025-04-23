@@ -11,11 +11,13 @@ const {
   deleteReservation,
 } = require("../controllers/reservations");
 
-// TODO: give access RUD to admin after finishing the routes
-router.route("/").get(protect, getReservations).post(protect, addReservation);
+router
+  .route("/")
+  .get(protect, authorize("admin", "shopOwner", "user"), getReservations)
+  .post(protect, authorize("user"), addReservation);
 router
   .route("/:id")
-  .get(protect, getReservation)
+  .get(protect, authorize("admin", "shopOwner", "user"), getReservation)
   .put(protect, authorize("admin", "shopOwner", "user"), updateReservation)
   .delete(protect, authorize("admin", "shopOwner", "user"), deleteReservation);
 

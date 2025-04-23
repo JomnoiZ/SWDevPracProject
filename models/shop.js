@@ -44,13 +44,14 @@ const ShopSchema = new mongoose.Schema(
     },
     shopOwner: {
       type: mongoose.Schema.ObjectId,
-      ref: "User",
+      ref: "ShopOwner",
       required: true,
     },
-  }, {
+  },
+  {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-}
+    toObject: { virtuals: true },
+  }
 );
 
 // Reverse populate with virtuals

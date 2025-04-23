@@ -1,6 +1,7 @@
+const mongoose = require('mongoose');
+const { Types } = mongoose;
 const Reservation = require("../models/reservation");
 const Shop = require("../models/shop");
-const req = require("express/lib/request");
 
 // @desc    Get all appointments
 // @route   GET /api/v1/appointments
@@ -8,14 +9,14 @@ const req = require("express/lib/request");
 // @desc    Get all reservations or reservations for a specific shop
 // @route   GET /api/v1/reservations
 // @route   GET /api/v1/shops/:shopId/reservations
-// @access  Private (user or admin)
+// @access  Public
 exports.getReservations = async (req, res, next) => {
   try {
     let query;
 
     const populateOptions = {
       path: "shop",
-      select: "name province tel openTime closeTime",
+      select: "name province tel openTime closeTime shopOwner",
     };
 
     if (req.params.shopId) {
@@ -29,16 +30,39 @@ exports.getReservations = async (req, res, next) => {
         populateOptions
       );
     } else {
-      if (req.user.role !== "admin") {
+      if (req.user.role === "user") {
         query = Reservation.find({ user: req.user.id }).populate(
           populateOptions
         );
+      } else if (req.user.role === "shopOwner") {
+        const userId = new Types.ObjectId(req.user.id);
+
+        query = Reservation.aggregate([
+          {
+            $lookup: {
+              from: "shops",
+              localField: "shop",
+              foreignField: "_id",
+              as: "shop",
+            },
+          },
+          {
+            $unwind: "$shop",
+          },
+          {
+            $match: {
+              "shop.shopOwner": userId,
+            },
+          },
+        ]);
       } else {
         query = Reservation.find().populate(populateOptions);
       }
     }
 
     const reservations = await query;
+
+    console.log(typeof req.user.id, reservations);
 
     res.status(200).json({
       success: true,
@@ -56,12 +80,12 @@ exports.getReservations = async (req, res, next) => {
 
 // @desc    Get single appointment
 // @route   GET /api/v1/appointments/:id
-// @access  Public
+// @access  Private
 exports.getReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime",
+      select: "name description tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res
@@ -71,7 +95,9 @@ exports.getReservation = async (req, res, next) => {
     // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
+      req.user.role !== "admin" &&
+      (reservation.shop.shopOwner.toString() !== req.user.id ||
+        req.user.role !== "shopOwner")
     ) {
       return res.status(401).json({
         success: false,
@@ -97,18 +123,20 @@ exports.getReservationByShopId = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime",
+      select: "name description tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res
         .status(400)
         .json({ success: false, message: "Cannot find reservation" });
     }
-    
+
     // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
+      req.user.role !== "admin" &&
+      (reservation.shop.shopOwner.toString() !== req.user.id ||
+        req.user.role !== "shopOwner")
     ) {
       return res.status(401).json({
         success: false,
@@ -148,8 +176,8 @@ exports.addReservation = async (req, res, next) => {
     // Check for existed reservation
     const existedReservations = await Reservation.find({ user: req.user.id });
 
-    // If the user is not an admin, they can only create 3 reservation.
-    if (existedReservations.length >= 3 && req.user.role !== "admin") {
+    // The user can only create 3 reservation.
+    if (existedReservations.length >= 3) {
       return res.status(400).json({
         success: false,
         error: `The user with ID ${req.user.id} has already made 3 Reservations`,
@@ -175,7 +203,16 @@ exports.addReservation = async (req, res, next) => {
 // @access  Private
 exports.updateReservation = async (req, res, next) => {
   try {
-    let reservation = await Reservation.findById(req.params.id);
+    let reservation = await Reservation.findById(req.params.id).populate({
+      path: "shop",
+      select: "name description tel openTime closeTime shopOwner",
+    });
+    if (!reservation) {
+      return res.status(404).json({
+        success: false,
+        error: `No reservation with the id of ${req.params.id}`,
+      });
+    }
 
     if (!reservation) {
       return res.status(404).json({
@@ -187,7 +224,9 @@ exports.updateReservation = async (req, res, next) => {
     // Make sure user is appointment owner
     if (
       reservation.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
+      req.user.role !== "admin" &&
+      (reservation.shop.shopOwner.toString() !== req.user.id ||
+        req.user.role !== "shopOwner")
     ) {
       return res.status(401).json({
         success: false,
@@ -218,7 +257,10 @@ exports.updateReservation = async (req, res, next) => {
 // @access  Private
 exports.deleteReservation = async (req, res, next) => {
   try {
-    const reservation = await Reservation.findById(req.params.id);
+    const reservation = await Reservation.findById(req.params.id).populate({
+      path: "shop",
+      select: "name description tel openTime closeTime shopOwner",
+    });
     if (!reservation) {
       return res.status(404).json({
         success: false,
@@ -229,7 +271,9 @@ exports.deleteReservation = async (req, res, next) => {
     // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
-      req.user.role !== "admin"
+      req.user.role !== "admin" &&
+      (reservation.shop.shopOwner.toString() !== req.params.shopId ||
+        req.user.role !== "shopOwner")
     ) {
       return res.status(401).json({
         success: false,

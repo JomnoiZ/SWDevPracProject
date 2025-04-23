@@ -1,6 +1,5 @@
 const Shop = require("../models/shop");
 const Reservation = require("../models/reservation");
-const { castObject } = require("../models/user");
 
 // @desc     Get all shops
 // @route    GET /api/v1/shops
@@ -118,14 +117,27 @@ exports.createShop = async (req, res, next) => {
 // @access   Private
 exports.updateShop = async (req, res, next) => {
   try {
-    const shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const shop = await Shop.findById(req.params.id);
 
     if (!shop) {
       return res.status(400).json({ success: false });
     }
+
+    // Make sure shop owner is shop owner
+    if (
+      shop.shopOwner.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: `User ${req.user.id} is not authorized to update this shop`,
+      });
+    }
+
+    shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
 
     res.status(200).json({ success: true, data: shop });
   } catch (err) {
@@ -146,6 +158,18 @@ exports.deleteShop = async (req, res, next) => {
         message: `Shop not found with id of ${req.params.id}`,
       });
     }
+
+    // Make sure shop owner is shop owner
+    if (
+      shop.shopOwner.toString() !== req.user.id &&
+      req.user.role !== "admin"
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: `User ${req.user.id} is not authorized to delete this shop`,
+      });
+    }
+
     await Reservation.deleteMany({ shop: req.params.id });
     await Shop.deleteOne({ _id: req.params.id });
 
