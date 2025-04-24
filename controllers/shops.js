@@ -87,7 +87,10 @@ exports.getShop = async (req, res, next) => {
     const shop = await Shop.findById(req.params.id);
 
     if (!shop) {
-      return res.status(400).json({ success: false });
+      return res.status(404).json({
+        success: false,
+        message: `Shop not found with id of ${req.params.id}`,
+      });
     }
 
     res.status(200).json({ success: true, data: shop });
@@ -120,10 +123,13 @@ exports.updateShop = async (req, res, next) => {
     const shop = await Shop.findById(req.params.id);
 
     if (!shop) {
-      return res.status(400).json({ success: false });
+      return res.status(404).json({
+        success: false,
+        message: `Shop not found with id of ${req.params.id}`,
+      });
     }
 
-    // Make sure shop owner is shop owner
+    // Make sure user is shop owner
     if (
       shop.shopOwner.toString() !== req.user.id &&
       req.user.role !== "admin"
@@ -134,7 +140,7 @@ exports.updateShop = async (req, res, next) => {
       });
     }
 
-    shop = await Shop.findByIdAndUpdate(req.params.id, req.body, {
+    await Shop.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
@@ -159,7 +165,7 @@ exports.deleteShop = async (req, res, next) => {
       });
     }
 
-    // Make sure shop owner is shop owner
+    // Make sure user is shop owner
     if (
       shop.shopOwner.toString() !== req.user.id &&
       req.user.role !== "admin"

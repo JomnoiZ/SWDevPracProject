@@ -185,7 +185,7 @@ exports.addReservation = async (req, res, next) => {
     }
 
     const reservation = await Reservation.create(req.body);
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       data: reservation,
     });
@@ -234,7 +234,7 @@ exports.updateReservation = async (req, res, next) => {
       });
     }
 
-    reservation = await Reservation.findByIdAndUpdate(req.params.id, req.body, {
+    await Reservation.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
