@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/db");
+const cors = require("cors");
 
 // Load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -21,6 +22,8 @@ app.use(express.json());
 
 // Cookie parser
 app.use(cookieParser());
+
+app.use(cors());
 
 app.use("/api/v1/shops", shops);
 app.use("/api/v1/reservations", reservations);

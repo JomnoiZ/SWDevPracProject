@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Types } = mongoose;
 const Reservation = require("../models/reservation");
 const Shop = require("../models/shop");
@@ -16,7 +16,8 @@ exports.getReservations = async (req, res, next) => {
 
     const populateOptions = {
       path: "shop",
-      select: "name province tel openTime closeTime shopOwner",
+      select:
+        "name address district province postalcode tel openTime closeTime shopOwner",
     };
 
     if (req.params.shopId) {
@@ -85,7 +86,8 @@ exports.getReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime shopOwner",
+      select:
+        "name address district province postalcode tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res
@@ -123,7 +125,8 @@ exports.getReservationByShopId = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime shopOwner",
+      select:
+        "name address district province postalcode tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res
@@ -205,7 +208,8 @@ exports.updateReservation = async (req, res, next) => {
   try {
     let reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime shopOwner",
+      select:
+        "name address district province postalcode tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res.status(404).json({
@@ -259,7 +263,8 @@ exports.deleteReservation = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
-      select: "name description tel openTime closeTime shopOwner",
+      select:
+        "name address district province postalcode tel openTime closeTime shopOwner",
     });
     if (!reservation) {
       return res.status(404).json({
