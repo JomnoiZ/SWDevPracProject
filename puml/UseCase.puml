@@ -1,0 +1,77 @@
+@startuml Massage Reservation Use Case Diagram
+left to right direction
+
+actor "User" as user
+actor "Shop Owner" as shopOwner
+actor "Admin" as admin
+
+rectangle "Massage Reservation System" as MassageReservationSystem {
+    rectangle "Shop System" as ShopSystem {
+        usecase "Get Shops" as getShops
+        usecase "Get Shop By ID" as getShopByID
+        usecase "Create New Shop" as createShop
+        usecase "Update Shop By ID" as updateShopByID
+        usecase "Delete Shop By ID" as deleteShopByID
+    }
+
+    rectangle "Reservation System" as ReservationSystem {
+        usecase "Get Reservations" as getReservations
+        usecase "Get Reservation By ID" as getReservationByID
+        usecase "Get Reservation By ShopID" as getReservationByShopID
+        usecase "Create Reservation" as createReservation
+        usecase "Update Reservation By ID" as updateReservationByID
+        usecase "Delete Reservation By ID" as deleteReservationByID
+    }
+
+    rectangle "Auth System" as AuthSystem {
+        usecase "Register User" as registerUser
+        usecase "Login User" as loginUser
+        usecase "Register Shop Owner" as registerShopOwner
+        usecase "Login Shop Owner" as loginShopOwner
+        usecase "Get Me" as getMe
+        usecase "Logout User" as logout
+    }
+}
+
+user -------- getShops
+user -------- getShopByID
+user -------- createReservation
+user -------- getReservations
+user -------- getReservationByID
+user -------- updateReservationByID
+user -------- deleteReservationByID
+user -------- registerUser
+user -------- loginUser
+user -------- getMe
+user -------- logout
+
+getShops -------- shopOwner
+getShopByID -------- shopOwner
+createShop -------- shopOwner
+updateShopByID -------- shopOwner
+deleteShopByID -------- shopOwner
+getReservations -------- shopOwner
+getReservationByID -------- shopOwner
+getReservationByShopID -------- shopOwner
+updateReservationByID -------- shopOwner
+deleteReservationByID -------- shopOwner
+registerShopOwner -------- shopOwner
+loginShopOwner -------- shopOwner
+getMe -------- shopOwner
+logout -------- shopOwner
+
+getShops ---------- admin
+getShopByID ---------- admin
+updateShopByID ---------- admin
+deleteShopByID ---------- admin
+getReservations ---------- admin
+getReservationByID ---------- admin
+getReservationByShopID ---------- admin
+updateReservationByID ---------- admin
+deleteReservationByID ---------- admin
+registerShopOwner ---------- admin
+loginShopOwner ---------- admin
+getMe ---------- admin
+logout ---------- admin
+
+@enduml
