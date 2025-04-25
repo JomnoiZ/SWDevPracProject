@@ -5,3 +5,5 @@ config/config.env
 
 *.postman_collection*
 puml/*_ex.puml
+
+out/
