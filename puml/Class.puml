@@ -1,0 +1,121 @@
+@startuml Massage Reservation System Class Diagram
+title "Massage Reservation System Class Diagram"
+left to right direction
+class "<<Application>>\nMassageReservationSystem" as MassageReservationSystem{
+
+}
+
+class "<<Representation>>\nUser" as RepresentationUser {
+  -name
+  -email
+  -tel
+  -role
+  -password
+  -createdAt
+}
+
+class "<<Representation>>\nShopOwner" as RepresentationShopOwner {
+  -name
+  -email
+  -tel
+  -role
+  -password
+  -createdAt
+  -shops
+}
+
+class "<<Representation>>\nShop" as RepresentationShop {
+  -name
+  -description
+  -address
+  -district
+  -province
+  -postalcode
+  -tel
+  -openTime
+  -closeTime
+  -shopOwner
+}
+
+class "<<Representation>>\nReservation" as RepresentationReservation {
+  -apptDate
+  -user
+  -shop
+  -wifiPassword
+  -createAt
+}
+
+class "<<Resource>>\nShops" as ResourceShops {
+  <<GET>> +getShops(): Shop[]
+  <<POST>> -createShop(): Shop
+}
+
+class "<<Resource>>\nShop" as ResourceShop {
+  <<GET>> +getShop(): Shop
+  <<PUT>> -updateShop(): Shop
+  <<DELETE>> -deleteShop(): void
+}
+
+class "<<Resource>>\nReservations" as ResourceReservations {
+  <<GET>> -getReservations(): Reservation[]
+  <<POST>> -addReservation(): Reservation
+}
+
+class "<<Resource>>\nReservation" as ResourceReservation {
+  <<GET>> -getReservation(): Reservation
+  <<PUT>> -updateReservation(): Reservation
+  <<DELETE>> -deleteReservation(): void
+}
+
+class "<<Resource>>\nAuth" as ResourceAuth {
+
+}
+class "<<Resource>>\nAuth" as ResourceAuthRegisterUser {
+  <<POST>> +registerUser(): User
+}
+class "<<Resource>>\nAuth" as ResourceAuthRegisterShopOwner {
+  <<POST>> +registerShopOwner(): ShopOwner
+}
+class "<<Resource>>\nAuth" as ResourceAuthLoginUser {
+  <<POST>> +loginUser(): User
+}
+class "<<Resource>>\nAuth" as ResourceAuthLoginShopOwner {
+  <<POST>> +loginShopOwner(): ShopOwner
+}
+class "<<Resource>>\nAuth" as ResourceAuthGetMe {
+  <<POST>> +getMe(): User|ShopOwner
+}
+class "<<Resource>>\nAuth" as ResourceAuthLogout {
+  <<POST>> +logout(): void
+}
+
+MassageReservationSystem ..> ResourceShops: "/shops\n<<Path>>"
+MassageReservationSystem ..> ResourceReservations: "/reservations\n<<Path>>"
+MassageReservationSystem ..> ResourceAuth: "/auth\n<<Path>>"
+
+ResourceShops ..> ResourceShop: "/{shopId}\n<<Path>>"
+ResourceShops ..> RepresentationShop: "<<use>>"
+ResourceShop ..> RepresentationShop: "<<use>>"
+ResourceShop ..> ResourceReservations: "/reservations\n<<Path>>"
+
+ResourceAuth ..> ResourceAuthRegisterUser: "/user/register\n<<Path>>"
+ResourceAuth ..> ResourceAuthLoginUser: "/user/login\n<<Path>>"
+ResourceAuth ..> ResourceAuthRegisterShopOwner: "/shop-owner/register\n<<Path>>"
+ResourceAuth ..> ResourceAuthLoginShopOwner: "/shop-owner/login\n<<Path>>"
+ResourceAuth ..> ResourceAuthGetMe: "/me\n<<Path>>"
+ResourceAuth ..> ResourceAuthLogout: "/logout\n<<Path>>"
+
+ResourceAuthRegisterUser ..> RepresentationUser: "<<use>>"
+ResourceAuthLoginUser ..> RepresentationUser: "<<use>>"
+ResourceAuthRegisterShopOwner ..> RepresentationShopOwner: "<<use>>"
+ResourceAuthLoginShopOwner ..> RepresentationShopOwner: "<<use>>"
+ResourceAuthGetMe ..> RepresentationUser: "<<use>>"
+ResourceAuthGetMe ..> RepresentationShopOwner: "<<use>>"
+ResourceAuthLogout ..> RepresentationUser: "<<use>>"
+ResourceAuthLogout ..> RepresentationShopOwner: "<<use>>"
+
+ResourceReservations ..> ResourceReservation: "/{resvId}\n<<Path>>"
+ResourceReservation ..> RepresentationReservation: "<<use>>"
+ResourceReservations ..> RepresentationReservation: "<<use>>"
+
+@enduml

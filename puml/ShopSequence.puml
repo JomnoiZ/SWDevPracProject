@@ -1,0 +1,94 @@
+@startuml Shop Sequence Diagram
+
+title "Shop Sequence Diagram"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:shop" as shop
+participant "<<middleware>>\n:auth" as middleware
+participant "<<service>>\n:jwt" as jwt
+participant "<<controllers>>\n:shop" as controllerShop
+participant "<<model>>\n:shop" as modelShop
+participant "<<model>>\n:shopOwner" as modelShopOwner
+database "<<MongoDB>>\n:shopowners" as shopOwnerDatabase
+database "<<MongoDB>>\n:shops" as shopDatabase
+
+client -> server ++ :req.post('/shops')
+server -> shop --++ :app.use('api/v1/shops', shops)
+shop -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelShopOwner ++ :findById(decoded.id)
+modelShopOwner -> shopOwnerDatabase ++ :find(_id: decoded.id)
+shopOwnerDatabase --> modelShopOwner -- :user
+modelShopOwner --> middleware -- :req.user
+middleware --> shop -- :next
+shop -> controllerShop --++ :createShop
+controllerShop -> modelShop ++ :create(req.body)
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+controllerShop <-- modelShop -- :shop
+controllerShop -> client -- :response
+
+client -> server ++ :req.get('/shops')
+server -> shop --++ :app.use('api/v1/shops', shops)
+shop -> controllerShop --++ :getShops
+controllerShop -> modelShop ++ :find()
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+controllerShop <-- modelShop -- :shop
+controllerShop -> client -- :response
+
+client -> server ++ :req.get('/shops/:id')
+server -> shop --++ :app.use('api/v1/shops', shops)
+shop -> controllerShop --++ :getShop
+controllerShop -> modelShop ++ :findById(req.param.id)
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+controllerShop <-- modelShop -- :shop
+controllerShop -> client -- :response
+
+client -> server ++ :req.put('/shops/:id')
+server -> shop --++ :app.use('api/v1/shops', shops)
+shop -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelShopOwner ++ :findById(decoded.id)
+modelShopOwner -> shopOwnerDatabase ++ :find(_id: decoded.id)
+shopOwnerDatabase --> modelShopOwner -- :user
+modelShopOwner --> middleware -- :req.user
+middleware --> shop -- :next
+shop -> controllerShop --++ :updateShop
+controllerShop -> modelShop ++ :findById(req.param.id)
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+modelShop --> controllerShop -- :shop
+controllerShop -> client :response
+controllerShop -> modelShop ++ :findByIdAndUpdate(req.params.id, req.body);
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+controllerShop <-- modelShop -- :shop
+controllerShop -> client -- :response
+
+client -> server ++ :req.delete('/shops/:id')
+server -> shop --++ :app.use('api/v1/shops', shops)
+shop -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelShopOwner ++ :findById(decoded.id)
+modelShopOwner -> shopOwnerDatabase ++ :find(_id: decoded.id)
+shopOwnerDatabase --> modelShopOwner -- :user
+modelShopOwner --> middleware -- :req.user
+middleware --> shop -- :next
+shop -> controllerShop --++ :deleteShop
+controllerShop -> modelShop ++ :findById(req.param.id)
+modelShop -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelShop -- :shop
+modelShop --> controllerShop -- :shop
+controllerShop -> client :response
+controllerShop -> modelShop ++ :findByIdAndDelete(req.param.id)
+modelShop -> shopDatabase ++ :ShopSchema
+controllerShop -> client -- :
+
+
+@enduml

@@ -1,0 +1,135 @@
+@startuml Reservation Sequence Diagram
+
+title "Reservation Sequence Diagram"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:reservation" as reservation
+participant "<<middleware>>\n:auth" as middleware
+participant "<<service>>\n:jwt" as jwt
+participant "<<controllers>>\n:reservation" as controllerReservation
+participant "<<model>>\n:reservation" as modelReservation
+participant "<<model>>\n:user" as modelUser
+database "<<MongoDB>>\n:reservations" as reservationDatabase
+database "<<MongoDB>>\n:shops" as shopDatabase
+database "<<MongoDB>>\n:users" as userDatabase
+
+client -> server ++ :req.post('/reservations')
+server -> reservation --++ :app.use('api/v1/reservations', reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id: decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :addReservation
+controllerReservation -> modelReservation ++ :findById(req.params.shopId)
+modelReservation -> shopDatabase ++ :ShopSchema
+shopDatabase --> modelReservation -- :shop
+controllerReservation <-- modelReservation -- :shop
+controllerReservation -> client :response
+controllerReservation -> modelReservation ++ :find(user: req.user.id)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :userReservation
+modelReservation --> controllerReservation -- :userReservation
+controllerReservation -> modelReservation ++ :create(req.body)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client -- :response
+
+client -> server ++ :req.get('/reservations')
+server -> reservation --++ :app.use('api/v1/reservations',reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id: decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :getReservations
+controllerReservation -> modelReservation ++ :find()
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client -- :response
+
+client -> server ++ :req.get('/shops/:shopId/reservations')
+server -> reservation --++ :app.use('api/v1/reservations', reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id: decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :getReservationsByShopId
+controllerReservation -> modelReservation ++ :find(shopOwner: shopId)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client -- :response
+
+client -> server ++ :req.get('/reservations/:id')
+server -> reservation --++ :app.use('api/v1/reservations', reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id: decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :getReservation
+controllerReservation -> modelReservation ++ :findById(req.param.id)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client -- :response
+
+client -> server++:req.put('/reservations/:id')
+server -> reservation --++ :app.use('api/v1/reservations', reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token, secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id:decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :updateReservation
+controllerReservation -> modelReservation ++ :findById(req.param.id)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation --:reservation
+controllerReservation -> client :response
+controllerReservation -> modelReservation ++ :findByIdAndUpdate(req.params.id,\nreq.body,{new:true,\nrunValidators:true});
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client -- :response
+
+client -> server ++ :req.delete('/reservations/:id')
+server -> reservation --++ :app.use('api/v1/reservations', reservations)
+reservation -> middleware ++ :protect
+middleware -> jwt ++ :verify(token,secret)
+jwt --> middleware -- :decoded
+middleware -> modelUser ++ :findById(decoded.id)
+modelUser -> userDatabase ++ :find(_id: decoded.id)
+userDatabase --> modelUser -- :user
+modelUser --> middleware -- :req.user
+middleware --> reservation -- :next
+reservation -> controllerReservation --++ :deleteReservation
+controllerReservation -> modelReservation ++ :findById(req.param.id)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+reservationDatabase --> modelReservation -- :reservation
+modelReservation --> controllerReservation -- :reservation
+controllerReservation -> client :response
+controllerReservation -> modelReservation ++ :findByIdAndDelete(req.param.id)
+modelReservation -> reservationDatabase ++ :ReservationSchema
+controllerReservation -> client
+@enduml
