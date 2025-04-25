@@ -1,4 +1,7 @@
-@startuml Massage Reservation Use Case Diagram
+@startuml Massage Reservation System Use Case Diagram
+
+title "Massage Reservation System Use Case Diagram"
+
 left to right direction
 
 actor "User" as user

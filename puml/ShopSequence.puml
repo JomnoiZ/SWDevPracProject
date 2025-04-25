@@ -1,6 +1,6 @@
-@startuml Manage Shop
+@startuml Shop Sequence Diagram
 
-title "Manage Shop"
+title "Shop Sequence Diagram"
 
 participant "Client" as client
 participant "<<javaScript>>\n:server" as server

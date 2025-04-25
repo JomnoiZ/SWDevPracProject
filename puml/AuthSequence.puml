@@ -1,6 +1,6 @@
-@startuml Manage Authentication
+@startuml Authentication Sequence Diagram
 
-title "Manage Authentication"
+title "Authentication Sequence Diagram"
 
 participant "Client" as client
 participant "<<javaScript>>\n:server" as server

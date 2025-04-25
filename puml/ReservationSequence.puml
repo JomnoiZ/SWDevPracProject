@@ -1,6 +1,6 @@
-@startuml Manage Reservation
+@startuml Reservation Sequence Diagram
 
-title "Manage Reservation"
+title "Reservation Sequence Diagram"
 
 participant "Client" as client
 participant "<<javaScript>>\n:server" as server

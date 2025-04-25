@@ -1,4 +1,4 @@
-@startuml Manage Massage Reservation Class Diagram
+@startuml Massage Reservation System Class Diagram
 title "Massage Reservation System Class Diagram"
 left to right direction
 class "<<Application>>\nMassageReservationSystem" as MassageReservationSystem{
