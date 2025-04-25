@@ -6,6 +6,7 @@ const { protect, authorize } = require("../middleware/auth");
 const {
   getReservations,
   getReservation,
+  getReservationByShopId,
   addReservation,
   updateReservation,
   deleteReservation,
