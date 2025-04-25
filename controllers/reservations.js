@@ -272,12 +272,11 @@ exports.deleteReservation = async (req, res, next) => {
         error: `No reservation with the id of ${req.params.id}`,
       });
     }
-
     // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin" &&
-      (reservation.shop.shopOwner.toString() !== req.params.shopId ||
+      (reservation.shop.shopOwner.toString() !== req.user.id ||
         req.user.role !== "shopOwner")
     ) {
       return res.status(401).json({
