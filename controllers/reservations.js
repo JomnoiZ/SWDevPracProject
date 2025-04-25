@@ -3,8 +3,8 @@ const { Types } = mongoose;
 const Reservation = require("../models/reservation");
 const Shop = require("../models/shop");
 
-// @desc    Get all appointments
-// @route   GET /api/v1/appointments
+// @desc    Get all reservations
+// @route   GET /api/v1/reservations
 // @access  Public
 // @desc    Get all reservations or reservations for a specific shop
 // @route   GET /api/v1/reservations
@@ -78,8 +78,8 @@ exports.getReservations = async (req, res, next) => {
   }
 };
 
-// @desc    Get single appointment
-// @route   GET /api/v1/appointments/:id
+// @desc    Get single reservation
+// @route   GET /api/v1/reservations/:id
 // @access  Private
 exports.getReservation = async (req, res, next) => {
   try {
@@ -92,7 +92,7 @@ exports.getReservation = async (req, res, next) => {
         .status(400)
         .json({ success: false, message: "Cannot find reservation" });
     }
-    // Make sure user is appointment owner
+    // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin" &&
@@ -116,10 +116,10 @@ exports.getReservation = async (req, res, next) => {
   }
 };
 
-// @desc    Get single appointment
-// @route   GET /api/v1/appointments/:id
+// @desc    Get reservations by shop id
+// @route   GET /api/v1/reservations/:id
 // @access  Public
-exports.getReservationByShopId = async (req, res, next) => {
+exports.getReservationsByShopId = async (req, res, next) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate({
       path: "shop",
@@ -131,7 +131,7 @@ exports.getReservationByShopId = async (req, res, next) => {
         .json({ success: false, message: "Cannot find reservation" });
     }
 
-    // Make sure user is appointment owner
+    // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin" &&
@@ -155,8 +155,8 @@ exports.getReservationByShopId = async (req, res, next) => {
   }
 };
 
-// @desc     Create new appointment
-// @route    POST /api/v1/hospitals/:hospitalId/appointments
+// @desc     Create new reservation
+// @route    POST /api/v1/hospitals/:hospitalId/reservations
 // @access   Private
 exports.addReservation = async (req, res, next) => {
   try {
@@ -198,8 +198,8 @@ exports.addReservation = async (req, res, next) => {
   }
 };
 
-// @desc    Update appointment
-// @route   PUT /api/v1/appointments/:id
+// @desc    Update reservation
+// @route   PUT /api/v1/reservations/:id
 // @access  Private
 exports.updateReservation = async (req, res, next) => {
   try {
@@ -221,7 +221,7 @@ exports.updateReservation = async (req, res, next) => {
       });
     }
 
-    // Make sure user is appointment owner
+    // Make sure user is reservation owner
     if (
       reservation.user.toString() !== req.user.id &&
       req.user.role !== "admin" &&
@@ -252,8 +252,8 @@ exports.updateReservation = async (req, res, next) => {
   }
 };
 
-// @desc    Delete appointment
-// @route   DELETE /api/v1/appointments/:id
+// @desc    Delete reservation
+// @route   DELETE /api/v1/reservations/:id
 // @access  Private
 exports.deleteReservation = async (req, res, next) => {
   try {

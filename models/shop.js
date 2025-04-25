@@ -47,6 +47,10 @@ const ShopSchema = new mongoose.Schema(
       ref: "ShopOwner",
       required: true,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     toJSON: { virtuals: true },
